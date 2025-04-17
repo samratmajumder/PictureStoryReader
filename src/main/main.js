@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-const Store = require('electron-store');
+// Fix the electron-store import
+const Store = require('electron-store').default || require('electron-store');
 const fs = require('fs');
 const mammoth = require('mammoth');
 const { PDFDocument } = require('pdf-lib');
