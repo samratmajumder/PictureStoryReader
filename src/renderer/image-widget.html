@@ -52,19 +52,46 @@
         object-fit: contain;
       }
       .widget-footer {
-        height: 40px;
+        height: auto;
+        min-height: 40px;
         background-color: rgba(240, 240, 240, 0.9);
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        padding: 0 10px;
+        padding: 8px;
+        gap: 8px;
       }
-      .zoom-controls button {
-        margin: 0 5px;
+      .widget-footer > div {
+        flex: 1;
+        min-width: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
       }
       .mode-selector {
         display: flex;
         align-items: center;
+      }
+      .mode-selector select {
+        flex: 1;
+        min-width: 100px;
+      }
+      .playback-controls {
+        white-space: nowrap;
+      }
+      .playback-controls button {
+        width: 50px;
+      }
+      .zoom-controls button {
+        width: 40px;
+        padding: 4px 0;
+        margin: 0 3px;
+      }
+      #interval-input {
+        width: 40px;
+        text-align: center;
       }
     </style>
   </head>
@@ -83,7 +110,7 @@
         </div>
       </div>
 
-      <div class="widget-footer">
+      <div class="widget-footer" id="widget-controls">
         <div class="mode-selector">
           <select id="mode-select">
             <option value="single">Single Image</option>
@@ -91,19 +118,12 @@
             <option value="list">Image List</option>
             <option value="script">Script-based</option>
           </select>
-          <button id="load-images-btn">Load Images</button>
+          <button id="load-images-btn">Load</button>
         </div>
 
         <div class="playback-controls">
           <button id="play-pause-btn">Play</button>
-          <input
-            type="number"
-            id="interval-input"
-            min="1"
-            max="60"
-            value="5"
-            style="width: 40px"
-          />
+          <input type="number" id="interval-input" min="1" max="60" value="5" />
           <span>sec</span>
         </div>
 

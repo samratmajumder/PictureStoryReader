@@ -30,6 +30,7 @@ let zoomLevel = 1;
 let panMode = false;
 let lastMousePosition = { x: 0, y: 0 };
 let imagePosition = { x: 0, y: 0 };
+let isImmersiveMode = false;
 
 // Event Listeners
 closeBtn.addEventListener('click', () => window.close());
@@ -47,6 +48,10 @@ imageDisplay.addEventListener('mousemove', pan);
 imageDisplay.addEventListener('mouseup', endPan);
 imageDisplay.addEventListener('mouseleave', endPan);
 imageDisplay.addEventListener('wheel', handleZoomScroll);
+
+// Add mouse activity tracking to notify main window
+document.addEventListener('mousemove', notifyMainWindowOfActivity);
+document.addEventListener('click', notifyMainWindowOfActivity);
 
 // Init
 ipcRenderer.on('init-widget', (event, data) => {
@@ -69,6 +74,12 @@ ipcRenderer.on('init-widget', (event, data) => {
       }
     }
   }
+});
+
+// Add immersive mode listener
+ipcRenderer.on('immersive-mode-update', (event, data) => {
+  const { isImmersive } = data;
+  toggleImmersiveMode(isImmersive);
 });
 
 // Functions
@@ -238,6 +249,39 @@ function handleZoomScroll(event) {
   event.preventDefault();
   const delta = event.deltaY < 0 ? 0.1 : -0.1;
   changeZoom(delta);
+}
+
+// Function to toggle immersive mode
+function toggleImmersiveMode(enable) {
+  isImmersiveMode = enable;
+  const widgetHeader = document.querySelector('.widget-header');
+  const widgetFooter = document.querySelector('.widget-footer');
+  const widgetContent = document.querySelector('.widget-content');
+  
+  if (enable) {
+    // Hide controls
+    widgetHeader.style.opacity = '0';
+    widgetFooter.style.opacity = '0';
+    widgetHeader.style.pointerEvents = 'none';
+    widgetFooter.style.pointerEvents = 'none';
+    document.body.style.backgroundColor = 'transparent';
+    widgetContent.style.backgroundColor = 'transparent';
+    document.body.style.cursor = 'none';
+  } else {
+    // Show controls
+    widgetHeader.style.opacity = '1';
+    widgetFooter.style.opacity = '1';
+    widgetHeader.style.pointerEvents = 'auto';
+    widgetFooter.style.pointerEvents = 'auto';
+    document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+    widgetContent.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    document.body.style.cursor = 'default';
+  }
+}
+
+// Function to notify main window of activity in this widget
+function notifyMainWindowOfActivity() {
+  ipcRenderer.send('widget-activity', { widgetId });
 }
 
 // Listen for reader position updates (for script mode)

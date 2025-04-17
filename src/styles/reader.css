@@ -3,15 +3,27 @@
   position: relative;
   overflow: auto;
   transition: background-color 0.3s ease;
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
+  background-color: #fff;
+  flex: 1;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
 }
 
 #reader-content {
-  padding: 20px;
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.6;
+  /* Prevent text blurring */
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+  will-change: auto;
 }
 
 #reader-content p {
@@ -29,7 +41,6 @@
   display: flex;
   flex-direction: row;
   width: max-content;
-  padding: 40px;
 }
 
 .mode-horizontal-scroll p {
@@ -84,4 +95,9 @@
 
 .font-size-xlarge {
   font-size: 26px;
+}
+
+/* In immersive mode, expand to full width but keep text clear */
+#reader-container.immersive {
+  padding: 0;
 }

@@ -201,6 +201,29 @@ ipcMain.on('update-widgets-position', (event, data) => {
   });
 });
 
+// Handle immersive mode updates and forward to widgets
+ipcMain.on('update-widgets-immersive-mode', (event, data) => {
+  const { isImmersive, widgetIds } = data;
+  
+  // Send immersive mode update to each specified widget
+  widgetIds.forEach(widget => {
+    const widgetWindow = widgetWindows.get(widget.id);
+    if (widgetWindow && !widgetWindow.isDestroyed()) {
+      widgetWindow.webContents.send('immersive-mode-update', {
+        isImmersive
+      });
+    }
+  });
+});
+
+// Handle activity notifications from widgets
+ipcMain.on('widget-activity', (event, data) => {
+  // Forward the activity notification to the main window
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('widget-activity-update');
+  }
+});
+
 // Create new widget window
 ipcMain.handle('create-widget', async (event, options) => {
   const widgetWindow = createWidgetWindow(options);

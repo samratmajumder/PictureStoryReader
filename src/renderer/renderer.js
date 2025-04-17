@@ -37,6 +37,11 @@ let currentLineNumber = 0;
 let lineCount = 0;
 let documentLines = [];
 
+// Add variables for immersive reading mode
+let isImmersiveMode = false;
+let inactivityTimer = null;
+let inactivityDelay = 3000; // 3 seconds of inactivity before hiding UI
+
 // Event Listeners
 openDocumentBtn.addEventListener('click', openDocument);
 createImageWidgetBtn.addEventListener('click', () => createWidget('image'));
@@ -263,41 +268,77 @@ function startScrolling() {
   const mode = currentLayout.readingMode;
   
   // Clear any existing scroll timer
-  if (scrollTimer) clearInterval(scrollTimer);
+  if (scrollTimer) cancelAnimationFrame(scrollTimer);
   
-  // Set up scrolling based on reading mode
-  scrollTimer = setInterval(() => {
+  // Track the last position and timestamp for smooth animation
+  let lastTimestamp = null;
+  let scrollPosition = mode === 'vertical-scroll' ? container.scrollTop : container.scrollLeft;
+  
+  // Use requestAnimationFrame for smoother scrolling
+  const scrollFrame = (timestamp) => {
+    if (!isScrolling) return;
+    
+    // Calculate time delta for consistent scrolling regardless of frame rate
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    const deltaTime = timestamp - lastTimestamp;
+    lastTimestamp = timestamp;
+    
+    // Calculate scroll increment based on speed and time delta
+    const scrollIncrement = (speed * deltaTime) / 16.67; // Normalize to ~60fps
+    
     if (mode === 'vertical-scroll') {
-      container.scrollTop += speed;
+      scrollPosition += scrollIncrement;
+      container.scrollTop = scrollPosition;
+      
       // Loop back to top when reached bottom
       if (container.scrollTop >= content.offsetHeight - container.offsetHeight) {
+        scrollPosition = 0;
         container.scrollTop = 0;
       }
     } else if (mode === 'horizontal-scroll') {
-      container.scrollLeft += speed;
+      scrollPosition += scrollIncrement;
+      container.scrollLeft = scrollPosition;
+      
       // Loop back to start when reached end
       if (container.scrollLeft >= content.offsetWidth - container.offsetWidth) {
+        scrollPosition = 0;
         container.scrollLeft = 0;
       }
     } else if (mode === 'book-mode') {
-      // Book mode behavior - flip pages
-      if (container.scrollLeft % container.offsetWidth === 0) {
-        container.scrollLeft += container.offsetWidth;
-      }
+      // Book mode - more discrete paging
+      // Only advance to next page when current page is fully visible
+      const pageWidth = container.offsetWidth;
+      const currentPage = Math.floor(scrollPosition / pageWidth);
+      const targetPosition = (currentPage + 1) * pageWidth;
+      
+      // Smoothly move to the next page
+      scrollPosition += Math.min(scrollIncrement, targetPosition - scrollPosition);
+      container.scrollLeft = scrollPosition;
+      
       // Loop back to start when reached end
       if (container.scrollLeft >= content.offsetWidth - container.offsetWidth) {
+        scrollPosition = 0;
         container.scrollLeft = 0;
       }
     }
-  }, 50); // Update every 50ms for smooth scrolling
+    
+    // Request next frame
+    scrollTimer = requestAnimationFrame(scrollFrame);
+  };
+  
+  // Start the animation
+  scrollTimer = requestAnimationFrame(scrollFrame);
+  
+  playPauseBtn.textContent = 'Pause';
 }
 
 function stopScrolling() {
   isScrolling = false;
   if (scrollTimer) {
-    clearInterval(scrollTimer);
+    cancelAnimationFrame(scrollTimer);
     scrollTimer = null;
   }
+  playPauseBtn.textContent = 'Start';
 }
 
 function changeFontSize(delta) {
@@ -372,11 +413,114 @@ async function loadLayout() {
   }
 }
 
+// Setup auto-hiding controls for immersive reading
+function setupImmersiveMode() {
+  const app = document.getElementById('app');
+  const controlsOverlay = document.getElementById('controls-overlay');
+  const readerContainer = document.getElementById('reader-container');
+  
+  // Mouse movement detection
+  document.addEventListener('mousemove', () => {
+    showUI();
+    resetInactivityTimer();
+  });
+  
+  // Mouse click detection
+  document.addEventListener('click', (event) => {
+    // Only toggle immersive mode if we click on the reader area (not on controls)
+    if (!event.target.closest('#controls-overlay')) {
+      resetInactivityTimer();
+    }
+  });
+  
+  // Keyboard activity detection
+  document.addEventListener('keydown', (event) => {
+    // Show UI on any key press
+    showUI();
+    resetInactivityTimer();
+    
+    // Escape key exits immersive mode completely
+    if (event.key === 'Escape') {
+      isImmersiveMode = false;
+      showUI(true); // Force show UI
+    }
+  });
+  
+  // Add listener for widget activity
+  ipcRenderer.on('widget-activity-update', () => {
+    // Reset inactivity timer when widgets report activity
+    showUI();
+    resetInactivityTimer();
+  });
+
+  // Initial timer setup
+  resetInactivityTimer();
+  
+  // Function to hide UI
+  function hideUI() {
+    if (!currentDocument) return; // Only hide UI if a document is loaded
+    
+    isImmersiveMode = true;
+    
+    // Simply hide the controls overlay without affecting the reader
+    controlsOverlay.classList.add('hidden');
+    
+    // Add immersive mode class to body for cursor handling
+    document.body.classList.add('immersive-mode');
+    
+    // Notify widgets to hide their controls
+    notifyWidgetsOfImmersiveMode(true);
+  }
+  
+  // Function to show UI
+  function showUI(force = false) {
+    if (force) {
+      isImmersiveMode = false;
+    }
+    
+    // Show controls overlay
+    controlsOverlay.classList.remove('hidden');
+    
+    // Remove immersive mode class from body
+    document.body.classList.remove('immersive-mode');
+    
+    // Notify widgets to show their controls
+    notifyWidgetsOfImmersiveMode(false);
+  }
+  
+  // Reset inactivity timer
+  function resetInactivityTimer() {
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+    }
+    
+    // Only start timer if a document is loaded
+    if (currentDocument) {
+      inactivityTimer = setTimeout(() => {
+        hideUI();
+      }, inactivityDelay);
+    }
+  }
+}
+
+// Notify widgets of immersive mode changes
+function notifyWidgetsOfImmersiveMode(isImmersive) {
+  if (widgets.size > 0) {
+    ipcRenderer.send('update-widgets-immersive-mode', {
+      isImmersive,
+      widgetIds: Array.from(widgets.values()).map(w => ({ id: w.id, windowId: w.windowId }))
+    });
+  }
+}
+
 // Initialize application
 function init() {
   // Set default font
   fontSelect.value = currentLayout.fontFamily;
   applyFontSettings();
+  
+  // Set up UI auto-hiding for immersive reading
+  setupImmersiveMode();
 }
 
 init();

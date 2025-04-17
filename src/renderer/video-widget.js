@@ -20,6 +20,7 @@ let widgetSettings = {
   currentIndex: 0
 };
 let isPlaying = false;
+let isImmersiveMode = false;
 
 // Event Listeners
 closeBtn.addEventListener('click', () => window.close());
@@ -31,6 +32,10 @@ nextVideoBtn.addEventListener('click', playNextVideo);
 muteBtn.addEventListener('click', toggleMute);
 volumeSlider.addEventListener('input', updateVolume);
 currentVideo.addEventListener('ended', handleVideoEnded);
+
+// Add mouse activity tracking to notify main window
+document.addEventListener('mousemove', notifyMainWindowOfActivity);
+document.addEventListener('click', notifyMainWindowOfActivity);
 
 // Init
 ipcRenderer.on('init-widget', (event, data) => {
@@ -47,6 +52,12 @@ ipcRenderer.on('init-widget', (event, data) => {
       displayVideo(widgetSettings.sources[widgetSettings.currentIndex]);
     }
   }
+});
+
+// Add immersive mode listener
+ipcRenderer.on('immersive-mode-update', (event, data) => {
+  const { isImmersive } = data;
+  toggleImmersiveMode(isImmersive);
 });
 
 // Functions
@@ -167,4 +178,37 @@ function updateNavigationButtons() {
   const hasMultipleVideos = widgetSettings.sources.length > 1;
   prevVideoBtn.disabled = !hasMultipleVideos;
   nextVideoBtn.disabled = !hasMultipleVideos;
+}
+
+// Function to toggle immersive mode
+function toggleImmersiveMode(enable) {
+  isImmersiveMode = enable;
+  const widgetHeader = document.querySelector('.widget-header');
+  const widgetFooter = document.querySelector('.widget-footer');
+  const widgetContent = document.querySelector('.widget-content');
+  
+  if (enable) {
+    // Hide controls
+    widgetHeader.style.opacity = '0';
+    widgetFooter.style.opacity = '0';
+    widgetHeader.style.pointerEvents = 'none';
+    widgetFooter.style.pointerEvents = 'none';
+    document.body.style.backgroundColor = 'transparent';
+    widgetContent.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    document.body.style.cursor = 'none';
+  } else {
+    // Show controls
+    widgetHeader.style.opacity = '1';
+    widgetFooter.style.opacity = '1';
+    widgetHeader.style.pointerEvents = 'auto';
+    widgetFooter.style.pointerEvents = 'auto';
+    document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+    widgetContent.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    document.body.style.cursor = 'default';
+  }
+}
+
+// Function to notify main window of activity in this widget
+function notifyMainWindowOfActivity() {
+  ipcRenderer.send('widget-activity', { widgetId });
 }
