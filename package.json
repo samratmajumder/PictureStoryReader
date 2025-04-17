@@ -1,0 +1,27 @@
+{
+  "name": "picturestory_reader",
+  "version": "1.0.0",
+  "description": "An immersive picture story reader application",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^35.1.5"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.1",
+    "mammoth": "^1.9.0",
+    "pdf-lib": "^1.17.1",
+    "pdf.js": "^0.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-grid-layout": "^1.5.1",
+    "uuid": "^11.1.0"
+  }
+}

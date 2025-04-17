@@ -1,0 +1,74 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.toolbar {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button {
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #666;
+}
+
+button:active {
+  background-color: #444;
+}
+
+select, input {
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #777;
+  background-color: #f5f5f5;
+}
+
+label {
+  font-size: 14px;
+}
+
+#reader-container {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  background-color: #fff;
+}
+
+/* Ensure the app fills the entire viewport */
+html, body {
+  height: 100%;
+  width: 100%;
+}

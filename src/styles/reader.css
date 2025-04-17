@@ -1,0 +1,87 @@
+/* Reader styles */
+#reader-container {
+  position: relative;
+  overflow: auto;
+  transition: background-color 0.3s ease;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+}
+
+#reader-content {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+#reader-content p {
+  margin-bottom: 1.2em;
+}
+
+/* Reading modes */
+.mode-vertical-scroll {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mode-horizontal-scroll {
+  display: flex;
+  flex-direction: row;
+  width: max-content;
+  padding: 40px;
+}
+
+.mode-horizontal-scroll p {
+  width: 700px;
+  margin-right: 40px;
+  padding: 0 20px;
+}
+
+.mode-book-mode {
+  display: flex;
+  flex-direction: row;
+  width: max-content;
+}
+
+.mode-book-mode p {
+  width: 350px;
+  margin-right: 20px;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  height: calc(100vh - 180px);
+  overflow: hidden;
+}
+
+/* Immersive mode - removes distractions */
+.immersive-mode {
+  background-color: #1a1a1a;
+  color: #eee;
+}
+
+.dark-theme {
+  background-color: #222;
+  color: #f0f0f0;
+}
+
+.sepia-theme {
+  background-color: #f4ecd8;
+  color: #5b4636;
+}
+
+/* Font adjustments for better readability */
+.font-size-small {
+  font-size: 14px;
+}
+
+.font-size-medium {
+  font-size: 18px;
+}
+
+.font-size-large {
+  font-size: 22px;
+}
+
+.font-size-xlarge {
+  font-size: 26px;
+}

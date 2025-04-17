@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Widget</title>
+    <link rel="stylesheet" href="../styles/widget.css" />
+    <style>
+      body {
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      .widget-container {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .widget-header {
+        height: 30px;
+        background-color: rgba(50, 50, 50, 0.8);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        color: white;
+        -webkit-app-region: drag;
+      }
+      .widget-controls {
+        -webkit-app-region: no-drag;
+      }
+      .widget-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+      .image-display {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+      }
+      .image-display img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+      .widget-footer {
+        height: 40px;
+        background-color: rgba(240, 240, 240, 0.9);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+      }
+      .zoom-controls button {
+        margin: 0 5px;
+      }
+      .mode-selector {
+        display: flex;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widget-container">
+      <div class="widget-header">
+        <span class="widget-title">Image Widget</span>
+        <div class="widget-controls">
+          <button id="close-btn">✕</button>
+        </div>
+      </div>
+
+      <div class="widget-content">
+        <div class="image-display" id="image-display">
+          <img id="current-image" src="" alt="No image loaded" />
+        </div>
+      </div>
+
+      <div class="widget-footer">
+        <div class="mode-selector">
+          <select id="mode-select">
+            <option value="single">Single Image</option>
+            <option value="folder">Random from Folder</option>
+            <option value="list">Image List</option>
+            <option value="script">Script-based</option>
+          </select>
+          <button id="load-images-btn">Load Images</button>
+        </div>
+
+        <div class="playback-controls">
+          <button id="play-pause-btn">Play</button>
+          <input
+            type="number"
+            id="interval-input"
+            min="1"
+            max="60"
+            value="5"
+            style="width: 40px"
+          />
+          <span>sec</span>
+        </div>
+
+        <div class="zoom-controls">
+          <button id="zoom-in-btn">+</button>
+          <button id="zoom-reset-btn">Reset</button>
+          <button id="zoom-out-btn">-</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../renderer/image-widget.js"></script>
+  </body>
+</html>

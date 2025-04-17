@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Video Widget</title>
+    <link rel="stylesheet" href="../styles/widget.css" />
+    <style>
+      body {
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      .widget-container {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .widget-header {
+        height: 30px;
+        background-color: rgba(50, 50, 50, 0.8);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        color: white;
+        -webkit-app-region: drag;
+      }
+      .widget-controls {
+        -webkit-app-region: no-drag;
+      }
+      .widget-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+      .video-display {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+      }
+      .video-display video {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      .widget-footer {
+        height: 40px;
+        background-color: rgba(240, 240, 240, 0.9);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+      }
+      .video-controls {
+        display: flex;
+        align-items: center;
+      }
+      .video-controls button {
+        margin: 0 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widget-container">
+      <div class="widget-header">
+        <span class="widget-title">Video Widget</span>
+        <div class="widget-controls">
+          <button id="close-btn">✕</button>
+        </div>
+      </div>
+
+      <div class="widget-content">
+        <div class="video-display" id="video-display">
+          <video id="current-video" controls>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+
+      <div class="widget-footer">
+        <div class="video-mode-selector">
+          <select id="mode-select">
+            <option value="single">Single Video (Loop)</option>
+            <option value="playlist">Video Playlist</option>
+          </select>
+          <button id="load-videos-btn">Load Videos</button>
+        </div>
+
+        <div class="video-controls">
+          <button id="prev-video-btn">⏮</button>
+          <button id="play-pause-btn">⏯</button>
+          <button id="next-video-btn">⏭</button>
+          <button id="mute-btn">🔊</button>
+          <input
+            type="range"
+            id="volume-slider"
+            min="0"
+            max="1"
+            step="0.1"
+            value="1"
+            style="width: 60px"
+          />
+        </div>
+      </div>
+    </div>
+
+    <script src="../renderer/video-widget.js"></script>
+  </body>
+</html>
